@@ -1,0 +1,191 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearchPostgres"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum ContentStatus {
+  DRAFT
+  REVIEW
+  PUBLISHED
+  ARCHIVED
+}
+
+enum UserRole {
+  ADMIN
+  EDITOR
+}
+
+// ============================================
+// NEWS MODULE
+// ============================================
+
+model News {
+  id       String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  slug     String  @unique @db.VarChar(255)
+  title    String  @db.VarChar(500)
+  subtitle String? @db.VarChar(1000)
+  content  String  @db.Text
+  excerpt  String? @db.VarChar(500)
+
+  // Media
+  featuredImageUrl String? @map("featured_image_url") @db.VarChar(500)
+  featuredImageAlt String? @map("featured_image_alt") @db.VarChar(255)
+
+  // SEO
+  metaTitle       String? @map("meta_title") @db.VarChar(255)
+  metaDescription String? @map("meta_description") @db.VarChar(500)
+  metaKeywords    String? @map("meta_keywords") @db.VarChar(500)
+
+  // Editorial Workflow
+  status ContentStatus @default(DRAFT)
+
+  // Author tracking
+  authorId String? @map("author_id") @db.Uuid
+  editorId String? @map("editor_id") @db.Uuid
+
+  // Timestamps
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  publishedAt DateTime? @map("published_at") @db.Timestamptz(6)
+  archivedAt  DateTime? @map("archived_at") @db.Timestamptz(6)
+
+  // Soft delete
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  // View counter
+  viewCount Int @default(0) @map("view_count")
+
+  // Relations
+  author User? @relation("NewsAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  editor User? @relation("NewsEditor", fields: [editorId], references: [id], onDelete: SetNull)
+
+  @@index([slug], name: "idx_news_slug")
+  @@index([status], name: "idx_news_status")
+  @@index([publishedAt], name: "idx_news_published_at")
+  @@index([status, publishedAt], name: "idx_news_status_published")
+  @@index([deletedAt], name: "idx_news_deleted_at")
+  @@map("news")
+}
+
+// ============================================
+// ANALYSIS MODULE
+// ============================================
+
+model Analysis {
+  id       String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  slug     String  @unique @db.VarChar(255)
+  title    String  @db.VarChar(500)
+  subtitle String? @db.VarChar(1000)
+  content  String  @db.Text
+  excerpt  String? @db.VarChar(500)
+
+  // Media
+  featuredImageUrl String? @map("featured_image_url") @db.VarChar(500)
+  featuredImageAlt String? @map("featured_image_alt") @db.VarChar(255)
+
+  // SEO
+  metaTitle       String? @map("meta_title") @db.VarChar(255)
+  metaDescription String? @map("meta_description") @db.VarChar(500)
+  metaKeywords    String? @map("meta_keywords") @db.VarChar(500)
+
+  // Editorial Workflow
+  status ContentStatus @default(DRAFT)
+
+  // Analysis specific
+  stockTicker  String? @map("stock_ticker") @db.VarChar(10)
+  analysisType String? @map("analysis_type") @db.VarChar(50)
+
+  // Author tracking
+  authorId String? @map("author_id") @db.Uuid
+  editorId String? @map("editor_id") @db.Uuid
+
+  // Timestamps
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  publishedAt DateTime? @map("published_at") @db.Timestamptz(6)
+  archivedAt  DateTime? @map("archived_at") @db.Timestamptz(6)
+
+  // Soft delete
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  // View counter
+  viewCount Int @default(0) @map("view_count")
+
+  // Relations
+  author User? @relation("AnalysisAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  editor User? @relation("AnalysisEditor", fields: [editorId], references: [id], onDelete: SetNull)
+
+  @@index([slug], name: "idx_analysis_slug")
+  @@index([status], name: "idx_analysis_status")
+  @@index([publishedAt], name: "idx_analysis_published_at")
+  @@index([stockTicker], name: "idx_analysis_ticker")
+  @@index([status, publishedAt], name: "idx_analysis_status_published")
+  @@index([deletedAt], name: "idx_analysis_deleted_at")
+  @@map("analysis")
+}
+
+// ============================================
+// AUTH MODULE
+// ============================================
+
+model User {
+  id           String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  email        String   @unique @db.VarChar(255)
+  name         String   @db.VarChar(255)
+  passwordHash String   @map("password_hash") @db.VarChar(255)
+  role         UserRole @default(EDITOR)
+
+  // Account status
+  isActive Boolean @default(true) @map("is_active")
+
+  // Timestamps
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  lastLoginAt DateTime? @map("last_login_at") @db.Timestamptz(6)
+
+  // Soft delete
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  // Relations
+  newsAsAuthor     News[]     @relation("NewsAuthor")
+  newsAsEditor     News[]     @relation("NewsEditor")
+  analysisAsAuthor Analysis[] @relation("AnalysisAuthor")
+  analysisAsEditor Analysis[] @relation("AnalysisEditor")
+
+  @@index([email], name: "idx_user_email")
+  @@index([role], name: "idx_user_role")
+  @@index([deletedAt], name: "idx_user_deleted_at")
+  @@map("users")
+}
+
+// ============================================
+// REDIRECT MAPPING
+// ============================================
+
+model RedirectMapping {
+  id          String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  oldSlug     String @unique @map("old_slug") @db.VarChar(255)
+  newSlug     String @map("new_slug") @db.VarChar(255)
+  contentType String @map("content_type") @db.VarChar(50)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([oldSlug], name: "idx_redirect_old_slug")
+  @@index([contentType], name: "idx_redirect_content_type")
+  @@map("redirect_mappings")
+}
