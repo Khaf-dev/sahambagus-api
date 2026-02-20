@@ -35,14 +35,19 @@ enum UserRole {
 // ============================================
 
 model News {
-  id       String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id       String  @id @default(dbgenerated("uuid_generate_v4()"))
   slug     String  @unique @db.VarChar(255)
   title    String  @db.VarChar(500)
   subtitle String? @db.VarChar(1000)
   content  String  @db.Text
   excerpt  String? @db.VarChar(500)
 
+  categoryId String?       @map("category_id")
+  // Editorial Workflow
+  status     ContentStatus @default(DRAFT)
+
   // Media
+  isFeatured       Boolean @default(false) @map("is_featured")
   featuredImageUrl String? @map("featured_image_url") @db.VarChar(500)
   featuredImageAlt String? @map("featured_image_alt") @db.VarChar(255)
 
@@ -51,12 +56,9 @@ model News {
   metaDescription String? @map("meta_description") @db.VarChar(500)
   metaKeywords    String? @map("meta_keywords") @db.VarChar(500)
 
-  // Editorial Workflow
-  status ContentStatus @default(DRAFT)
-
   // Author tracking
-  authorId String? @map("author_id") @db.Uuid
-  editorId String? @map("editor_id") @db.Uuid
+  authorId String? @map("author_id")
+  editorId String? @map("editor_id")
 
   // Timestamps
   createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
@@ -71,15 +73,63 @@ model News {
   viewCount Int @default(0) @map("view_count")
 
   // Relations
-  author User? @relation("NewsAuthor", fields: [authorId], references: [id], onDelete: SetNull)
-  editor User? @relation("NewsEditor", fields: [editorId], references: [id], onDelete: SetNull)
+  //  author User? @relation("NewsAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  //  editor User? @relation("NewsEditor", fields: [editorId], references: [id], onDelete: SetNull)
+  category Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  tags     NewsTag[]
 
   @@index([slug], name: "idx_news_slug")
   @@index([status], name: "idx_news_status")
   @@index([publishedAt], name: "idx_news_published_at")
   @@index([status, publishedAt], name: "idx_news_status_published")
   @@index([deletedAt], name: "idx_news_deleted_at")
+  @@index([isFeatured, status], name: "idx_news_featured_status")
+  @@index([categoryId], name: "idx_news_category_id")
   @@map("news")
+}
+
+// ============================================
+// News Tags
+// ============================================
+model NewsTag {
+  id     String @id @default(dbgenerated("uuid_generate_v4()"))
+  newsId String @map("news_id")
+  tagId  String @map("tag_id")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  // Relations
+  news News @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([newsId, tagId], name: "unique_news_tag")
+  @@index([newsId], name: "idx_news_tag_news_id")
+  @@index([tagId], name: "idx_news_tag_tag_id")
+  @@map("news_tags")
+}
+
+// ============================================
+// Category
+// ============================================
+
+model Category {
+  id          String  @id @default(dbgenerated("uuid_generate_v4()"))
+  name        String  @unique @db.VarChar(100)
+  slug        String  @unique @db.VarChar(100)
+  description String? @db.VarChar(500)
+  color       String? @db.VarChar(7) // Hex color
+  icon        String? @db.VarChar(50) // Icon name for frontend
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  // Relations
+  news News[]
+  // analysis Analysis[] // untuk nanti
+
+  @@index([slug], name: "idx_category_slug")
+  @@map("categories")
 }
 
 // ============================================
@@ -87,7 +137,7 @@ model News {
 // ============================================
 
 model Analysis {
-  id       String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id       String  @id @default(dbgenerated("uuid_generate_v4()"))
   slug     String  @unique @db.VarChar(255)
   title    String  @db.VarChar(500)
   subtitle String? @db.VarChar(1000)
@@ -111,8 +161,8 @@ model Analysis {
   analysisType String? @map("analysis_type") @db.VarChar(50)
 
   // Author tracking
-  authorId String? @map("author_id") @db.Uuid
-  editorId String? @map("editor_id") @db.Uuid
+  authorId String? @map("author_id")
+  editorId String? @map("editor_id")
 
   // Timestamps
   createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
@@ -127,8 +177,8 @@ model Analysis {
   viewCount Int @default(0) @map("view_count")
 
   // Relations
-  author User? @relation("AnalysisAuthor", fields: [authorId], references: [id], onDelete: SetNull)
-  editor User? @relation("AnalysisEditor", fields: [editorId], references: [id], onDelete: SetNull)
+  //  author User? @relation("AnalysisAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  //  editor User? @relation("AnalysisEditor", fields: [editorId], references: [id], onDelete: SetNull)
 
   @@index([slug], name: "idx_analysis_slug")
   @@index([status], name: "idx_analysis_status")
@@ -140,11 +190,29 @@ model Analysis {
 }
 
 // ============================================
+// Tag
+// ============================================
+model Tag {
+  id   String @id @default(dbgenerated("uuid_generate_v4()"))
+  name String @unique @db.VarChar(50)
+  slug String @unique @db.VarChar(50)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // RElations
+  newsItems NewsTag[]
+
+  @@index([slug], name: "idx_tag_slug")
+  @@map("tags")
+}
+
+// ============================================
 // AUTH MODULE
 // ============================================
 
 model User {
-  id           String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id           String   @id @default(dbgenerated("uuid_generate_v4()"))
   email        String   @unique @db.VarChar(255)
   name         String   @db.VarChar(255)
   passwordHash String   @map("password_hash") @db.VarChar(255)
@@ -162,10 +230,10 @@ model User {
   deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
 
   // Relations
-  newsAsAuthor     News[]     @relation("NewsAuthor")
-  newsAsEditor     News[]     @relation("NewsEditor")
-  analysisAsAuthor Analysis[] @relation("AnalysisAuthor")
-  analysisAsEditor Analysis[] @relation("AnalysisEditor")
+  //  newsAsAuthor     News[]     @relation("NewsAuthor")
+  //  newsAsEditor     News[]     @relation("NewsEditor")
+  //  analysisAsAuthor Analysis[] @relation("AnalysisAuthor")
+  //  analysisAsEditor Analysis[] @relation("AnalysisEditor")
 
   @@index([email], name: "idx_user_email")
   @@index([role], name: "idx_user_role")
@@ -178,7 +246,7 @@ model User {
 // ============================================
 
 model RedirectMapping {
-  id          String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id          String @id @default(dbgenerated("uuid_generate_v4()"))
   oldSlug     String @unique @map("old_slug") @db.VarChar(255)
   newSlug     String @map("new_slug") @db.VarChar(255)
   contentType String @map("content_type") @db.VarChar(50)

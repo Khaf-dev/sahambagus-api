@@ -18,6 +18,7 @@ export class NewsEntity {
     private _content: string,
     private _excerpt: string | null,
     private _status: ContentStatus,
+    private _isFeatured: boolean,
     private _featuredImageUrl: string | null,
     private _featuredImageAlt: string | null,
     private _metaTitle: string | null,
@@ -48,6 +49,7 @@ export class NewsEntity {
     subtitle?: string | null;
     content: string;
     excerpt?: string | null;
+    isFeatured?: boolean;
     authorId: string;
     featuredImageUrl?: string | null;
     featuredImageAlt?: string | null;
@@ -63,6 +65,7 @@ export class NewsEntity {
       props.content,
       props.excerpt || null,
       ContentStatus.DRAFT,
+      props.isFeatured || false,
       props.featuredImageUrl || null,
       props.featuredImageAlt || null,
       props.metaTitle || null,
@@ -89,6 +92,7 @@ export class NewsEntity {
     content: string;
     excerpt: string | null;
     status: string;
+    isFeatured: boolean;
     featuredImageUrl: string | null;
     featuredImageAlt: string | null;
     metaTitle: string | null;
@@ -110,6 +114,7 @@ export class NewsEntity {
       props.content,
       props.excerpt,
       ContentStatus.fromString(props.status),
+      props.isFeatured,
       props.featuredImageUrl,
       props.featuredImageAlt,
       props.metaTitle,
@@ -147,6 +152,10 @@ export class NewsEntity {
 
   get status(): ContentStatus {
     return this._status;
+  }
+
+  get isFeatured(): boolean {
+    return this._isFeatured;
   }
 
   get featuredImageUrl(): string | null {
@@ -196,12 +205,12 @@ export class NewsEntity {
   // ============================================
   // Business Methods
   // ============================================
-
+  
   /**
    * Update news content (only in DRAFT status)
-   */
-  update(props: {
-    title?: string;
+  */
+ update(props: {
+   title?: string;
     subtitle?: string | null;
     content?: string;
     excerpt?: string | null;
@@ -215,7 +224,7 @@ export class NewsEntity {
     if (!this._status.isDraft()) {
       throw new Error('Can only edit news in DRAFT status');
     }
-
+    
     if (props.title !== undefined) this._title = props.title;
     if (props.subtitle !== undefined) this._subtitle = props.subtitle;
     if (props.content !== undefined) this._content = props.content;
@@ -225,23 +234,33 @@ export class NewsEntity {
     if (props.metaTitle !== undefined) this._metaTitle = props.metaTitle;
     if (props.metaDescription !== undefined) this._metaDescription = props.metaDescription;
     if (props.metaKeywords !== undefined) this._metaKeywords = props.metaKeywords;
-
+    
     this._updatedAt = new Date();
     this.validate();
+  }
+  
+  setFeatured(featured: boolean): void {
+    // Business rule: Only published news can be featured
+    if (featured && !this._status.isPublished()) {
+      throw new Error('Only published news can be featured');
+    }
+ 
+    this._isFeatured = featured;
+    this._updatedAt = new Date();
   }
 
   /**
    * Submit for review (DRAFT → REVIEW)
-   */
-  submitForReview(): void {
-    if (!this._status.isDraft()) {
-      throw new Error('Can only submit DRAFT news for review');
+  */
+ submitForReview(): void {
+   if (!this._status.isDraft()) {
+     throw new Error('Can only submit DRAFT news for review');
     }
-
+    
     this._status = ContentStatus.REVIEW;
     this._updatedAt = new Date();
   }
-
+  
   /**
    * Publish news (REVIEW → PUBLISHED)
    */

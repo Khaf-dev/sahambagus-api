@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { RedisModule } from './shared/cache';
 import { DatabaseModule } from './shared/database';
 import { HealthModule } from './modules/health/health.module';
+import { NewsModule } from './modules/news/news.module';
 import appConfig from './config/app.config';
 
 /**
@@ -28,6 +29,7 @@ import appConfig from './config/app.config';
 
     // Features
     HealthModule,
+    NewsModule,
   ],
 })
 export class AppModule {}
