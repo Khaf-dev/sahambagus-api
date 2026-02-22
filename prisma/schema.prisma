@@ -18,6 +18,13 @@ datasource db {
 // ENUMS
 // ============================================
 
+enum AnalysisType {
+  TECHNICAL
+  FUNDAMENTAL
+  SENTIMENT
+  MARKET_UPDATE
+}
+
 enum ContentStatus {
   DRAFT
   REVIEW
@@ -91,6 +98,7 @@ model News {
 // ============================================
 // News Tags
 // ============================================
+
 model NewsTag {
   id     String @id @default(dbgenerated("uuid_generate_v4()"))
   newsId String @map("news_id")
@@ -125,8 +133,8 @@ model Category {
   deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
 
   // Relations
-  news News[]
-  // analysis Analysis[] // untuk nanti
+  news     News[]
+  analysis Analysis[] // untuk nanti
 
   @@index([slug], name: "idx_category_slug")
   @@map("categories")
@@ -144,9 +152,18 @@ model Analysis {
   content  String  @db.Text
   excerpt  String? @db.VarChar(500)
 
+  // Analysis-specific fields
+  stockTicker  String       @map("stock_ticker") @db.VarChar(20)
+  analysisType AnalysisType @map("analysis_type")
+  targetPrice  Decimal?     @map("target_price") @db.Decimal(15, 2)
+
   // Media
+  isFeatured       Boolean @default(false) @map("is_featured")
   featuredImageUrl String? @map("featured_image_url") @db.VarChar(500)
   featuredImageAlt String? @map("featured_image_alt") @db.VarChar(255)
+
+  // Categorization
+  categoryId String? @map("category_id")
 
   // SEO
   metaTitle       String? @map("meta_title") @db.VarChar(255)
@@ -155,10 +172,6 @@ model Analysis {
 
   // Editorial Workflow
   status ContentStatus @default(DRAFT)
-
-  // Analysis specific
-  stockTicker  String? @map("stock_ticker") @db.VarChar(10)
-  analysisType String? @map("analysis_type") @db.VarChar(50)
 
   // Author tracking
   authorId String? @map("author_id")
@@ -179,19 +192,25 @@ model Analysis {
   // Relations
   //  author User? @relation("AnalysisAuthor", fields: [authorId], references: [id], onDelete: SetNull)
   //  editor User? @relation("AnalysisEditor", fields: [editorId], references: [id], onDelete: SetNull)
+  analysisTags AnalysisTag[]
+  category     Category?     @relation(fields: [categoryId], references: [id])
 
   @@index([slug], name: "idx_analysis_slug")
   @@index([status], name: "idx_analysis_status")
   @@index([publishedAt], name: "idx_analysis_published_at")
-  @@index([stockTicker], name: "idx_analysis_ticker")
   @@index([status, publishedAt], name: "idx_analysis_status_published")
   @@index([deletedAt], name: "idx_analysis_deleted_at")
+  @@index([isFeatured, status], name: "idx_analysis_featured_status")
+  @@index([stockTicker], name: "idx_analysis_stock_ticker")
+  @@index([analysisType], name: "idx_analysis_type")
+  @@index([categoryId], name: "idx_analysis_category_id")
   @@map("analysis")
 }
 
 // ============================================
-// Tag
+// Tag MODEL 
 // ============================================
+
 model Tag {
   id   String @id @default(dbgenerated("uuid_generate_v4()"))
   name String @unique @db.VarChar(50)
@@ -201,10 +220,32 @@ model Tag {
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   // RElations
-  newsItems NewsTag[]
+  newsItems     NewsTag[]
+  analysisItems AnalysisTag[]
 
   @@index([slug], name: "idx_tag_slug")
   @@map("tags")
+}
+
+// ============================================
+// AnalysisTag Model
+// ============================================
+
+model AnalysisTag {
+  id         String @id @default(dbgenerated("uuid_generate_v4()"))
+  analysisId String @map("analysis_id")
+  tagId      String @map("tag_id")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  // Relations
+  analysis Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  tag      Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([analysisId, tagId], name: "unique_analysis_tag")
+  @@index([analysisId], name: "idx_analysis_tag_analysis_id")
+  @@index([tagId], name: "idx_analysis_tag_tag_id")
+  @@map("analysis_tags")
 }
 
 // ============================================

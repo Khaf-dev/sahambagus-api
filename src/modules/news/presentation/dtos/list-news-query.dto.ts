@@ -5,7 +5,8 @@ import {
   Min, 
   Max, 
   IsIn, 
-  IsBoolean
+  IsBoolean,
+  IsUUID
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -39,6 +40,14 @@ export class ListNewsQueryDto {
   @Type(() => Boolean)
   @IsBoolean()
   isFeatured?: boolean;
+
+  @IsUUID()
+  @IsOptional()
+  categoryId?: string;
+
+  @IsUUID()
+  @IsOptional()
+  tagId?: string;
 
   @IsOptional()
   @IsString()

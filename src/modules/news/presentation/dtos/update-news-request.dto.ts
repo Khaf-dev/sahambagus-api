@@ -3,7 +3,9 @@ import {
   IsOptional, 
   MaxLength, 
   MinLength, 
-  IsBoolean
+  IsBoolean,
+  IsUUID,
+  IsArray
 } from 'class-validator';
 
 /**
@@ -36,6 +38,15 @@ export class UpdateNewsRequestDto {
   @IsBoolean()
   @IsOptional()
   isFeatured?: boolean;
+
+  @IsUUID()
+  @IsOptional()
+  categoryId?: string;
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  tags?: string[];
 
   @IsString()
   @IsOptional()

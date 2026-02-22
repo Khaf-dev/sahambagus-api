@@ -4,6 +4,8 @@ import { RedisModule } from './shared/cache';
 import { DatabaseModule } from './shared/database';
 import { HealthModule } from './modules/health/health.module';
 import { NewsModule } from './modules/news/news.module';
+import { CategoryModule } from './modules/category/category.module';
+import { TagModule } from './modules/tag/tag.module';
 import appConfig from './config/app.config';
 
 /**
@@ -30,6 +32,8 @@ import appConfig from './config/app.config';
     // Features
     HealthModule,
     NewsModule,
+    CategoryModule,
+    TagModule,
   ],
 })
 export class AppModule {}

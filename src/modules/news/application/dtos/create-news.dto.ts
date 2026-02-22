@@ -10,6 +10,8 @@ export class CreateNewsDto {
     content: string;
     excerpt?: string;
     isFeatured?: boolean;
+    categoryId?: string;
+    tags?: string[];
     featuredImageUrl?: string;
     featuredImageAlt?: string;
     metaTitle?: string;

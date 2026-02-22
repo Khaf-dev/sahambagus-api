@@ -18,6 +18,9 @@ export interface INewsRepository {
     existsBySlug(slug: string): Promise<boolean>;
     delete(id: string): Promise<void>;
     hardDelete(id: string): Promise<void>;
+    addTagsToNews(newsId: string, tagIds: string[]): Promise<void>;
+    getTagsForNews(newsId: string): Promise<any[]>;
+    getCategoryForNews(categoryId: string | null): Promise<any | null>;
 }
 
 /**
@@ -34,6 +37,9 @@ export interface FindManyOptions {
     searchTerm?: string;
 
     isFeatured?: boolean;
+
+    categoryId?: string;
+    tagId?: string;
     dateFrom?: string;
     dateTo?: string;
 
@@ -52,6 +58,8 @@ export interface CountOptions {
     status?: string;
     authorId?: string;
     isFeatured?: boolean;
+    categoryId?: string;
+    tagId?: string;
     includeDeleted?: boolean;
 }
 

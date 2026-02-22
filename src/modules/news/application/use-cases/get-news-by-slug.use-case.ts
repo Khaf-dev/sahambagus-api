@@ -5,6 +5,10 @@ import {
 } from '../../domain';
 import { NewsResponseDto } from "../dtos";
 import { NewsMapper } from "../mappers";
+import { ICategoryRepository } from "src/modules/category/domain";
+import { ITagRepository } from "src/modules/tag/domain";
+import { CategoryMapper } from "src/modules/category/application";
+import { TagMapper } from "src/modules/tag/application";
 
 /**
  * GetNewsBySlugUseCase
@@ -17,6 +21,10 @@ export class GetNewsBySlugUseCase {
     constructor(
         @Inject(INewsRepository)
         private readonly newsRepository: INewsRepository,
+        @Inject(ICategoryRepository)
+        private readonly categoryRepository: ICategoryRepository,
+        @Inject(ITagRepository)
+        private readonly tagRepository: ITagRepository,
     ) {}
 
     async execute(slug: string): Promise<NewsResponseDto> {
@@ -29,8 +37,21 @@ export class GetNewsBySlugUseCase {
         // 2. Increment views (only for published)
         news.incrementViews();
         await this.newsRepository.save(news);
+
+        // 3. Get Category
+        const category = news.categoryId
+          ? await this.categoryRepository.findById(news.categoryId)
+          : null;
+
+        // 4. get tags
+        const tags = await this.newsRepository.getTagsForNews(news.id); 
+        const tagEntities = await this.tagRepository.findByIds(tags.map((t: any) => t.id));
         
         // 3. Return DTO
-        return NewsMapper.toDto(news);
+        return NewsMapper.toDto(
+            news,
+            category ? CategoryMapper.toDto(category) : null,
+            TagMapper.toListDto(tagEntities),
+        );
     }
 }

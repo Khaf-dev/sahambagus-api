@@ -19,6 +19,7 @@ export class NewsEntity {
     private _excerpt: string | null,
     private _status: ContentStatus,
     private _isFeatured: boolean,
+    private _categoryId: string | null,
     private _featuredImageUrl: string | null,
     private _featuredImageAlt: string | null,
     private _metaTitle: string | null,
@@ -50,6 +51,7 @@ export class NewsEntity {
     content: string;
     excerpt?: string | null;
     isFeatured?: boolean;
+    categoryId?: string | null;
     authorId: string;
     featuredImageUrl?: string | null;
     featuredImageAlt?: string | null;
@@ -66,6 +68,7 @@ export class NewsEntity {
       props.excerpt || null,
       ContentStatus.DRAFT,
       props.isFeatured || false,
+      props.categoryId || null,
       props.featuredImageUrl || null,
       props.featuredImageAlt || null,
       props.metaTitle || null,
@@ -93,6 +96,7 @@ export class NewsEntity {
     excerpt: string | null;
     status: string;
     isFeatured: boolean;
+    categoryId: string | null;
     featuredImageUrl: string | null;
     featuredImageAlt: string | null;
     metaTitle: string | null;
@@ -115,6 +119,7 @@ export class NewsEntity {
       props.excerpt,
       ContentStatus.fromString(props.status),
       props.isFeatured,
+      props.categoryId,
       props.featuredImageUrl,
       props.featuredImageAlt,
       props.metaTitle,
@@ -156,6 +161,10 @@ export class NewsEntity {
 
   get isFeatured(): boolean {
     return this._isFeatured;
+  }
+
+  get categoryId(): string | null {
+    return this._categoryId;
   }
 
   get featuredImageUrl(): string | null {
@@ -210,10 +219,11 @@ export class NewsEntity {
    * Update news content (only in DRAFT status)
   */
  update(props: {
-   title?: string;
+    title?: string;
     subtitle?: string | null;
     content?: string;
     excerpt?: string | null;
+    categoryId?: string | null;
     featuredImageUrl?: string | null;
     featuredImageAlt?: string | null;
     metaTitle?: string | null;
@@ -229,6 +239,7 @@ export class NewsEntity {
     if (props.subtitle !== undefined) this._subtitle = props.subtitle;
     if (props.content !== undefined) this._content = props.content;
     if (props.excerpt !== undefined) this._excerpt = props.excerpt;
+    if (props.categoryId !== undefined) this._categoryId = props.categoryId;
     if (props.featuredImageUrl !== undefined) this._featuredImageUrl = props.featuredImageUrl;
     if (props.featuredImageAlt !== undefined) this._featuredImageAlt = props.featuredImageAlt;
     if (props.metaTitle !== undefined) this._metaTitle = props.metaTitle;

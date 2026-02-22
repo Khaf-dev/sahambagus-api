@@ -11,7 +11,12 @@ export class NewsMapper {
     /**
      * Entity -> Full response DTO
      */
-    static toDto(news: NewsEntity): NewsResponseDto {
+    static toDto(
+        news: NewsEntity,
+        category?: any,
+        tags?: any[],
+
+    ): NewsResponseDto {
         return {
             id: news.id,
             slug: news.slug.toString(),
@@ -22,6 +27,11 @@ export class NewsMapper {
             status: news.status.toString(),
     
             isFeatured: news.isFeatured,
+
+            categoryId: news.categoryId,
+            category: category || null,
+            tags: tags || [],
+
             featuredImageUrl: news.featuredImageUrl,
             featuredImageAlt: news.featuredImageAlt,
     
@@ -44,7 +54,11 @@ export class NewsMapper {
     /**
      * Entity -> list item DTO (lighter)
      */
-    static toListItemDto(news: NewsEntity): NewsListItemDto {
+    static toListItemDto(
+        news: NewsEntity,
+        category?: any,
+        tags?: any[],
+    ): NewsListItemDto {
         return {
             id: news.id,
             slug: news.slug.toString(),
@@ -53,6 +67,11 @@ export class NewsMapper {
             status: news.status.toString(),
 
             isFeatured: news.isFeatured,
+
+            categoryId: news.categoryId,
+            category: category || null,
+            tags: tags || [],
+            
             featuredImageUrl: news.featuredImageUrl,
 
             authorId: news.authorId,

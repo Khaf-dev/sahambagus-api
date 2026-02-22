@@ -1,3 +1,6 @@
+import { CategoryResponseDto } from "src/modules/category/application";
+import { TagResponseDto } from "src/modules/tag/application";
+
 /**
  * NewsListItemDto
  * 
@@ -12,6 +15,11 @@ export class NewsListItemDto {
     status: string;
 
     isFeatured: boolean;
+
+    categoryId: string | null;
+    category: CategoryResponseDto | null;
+    tags: TagResponseDto[];
+    
     featuredImageUrl: string | null;
 
     authorId: string | null;

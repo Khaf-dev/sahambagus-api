@@ -13,6 +13,8 @@ import {
 import { NewsRepository } from './infrastructure/repositories/news.repository';
 import { INewsRepository } from './domain';
 import { NewsController } from './presentation/controllers';
+import { TagModule } from '../tag/tag.module';
+import { CategoryModule } from '../category/category.module';
 
 /**
  * News Module
@@ -21,6 +23,7 @@ import { NewsController } from './presentation/controllers';
  * Follows Clean Architecture dependency injection.
  */
 @Module({
+  imports: [TagModule, CategoryModule],
   controllers: [NewsController],
   providers: [
     // Repository

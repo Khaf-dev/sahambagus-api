@@ -8,6 +8,10 @@ import {
 import { CreateNewsDto, NewsResponseDto } from '../dtos';
 import { NewsMapper } from '../mappers';
 import { randomUUID } from 'crypto';
+import { ITagRepository } from 'src/modules/tag/domain';
+import { ICategoryRepository } from 'src/modules/category/domain';
+import { CategoryMapper } from 'src/modules/category/application';
+import { TagMapper } from 'src/modules/tag/application';
 
 @Injectable()
 export class CreateNewsUseCase {
@@ -16,6 +20,10 @@ export class CreateNewsUseCase {
   constructor(
     @Inject(INewsRepository)
     private readonly newsRepository: INewsRepository,
+    @Inject(ITagRepository)
+    private readonly tagRepository: ITagRepository,
+    @Inject(ICategoryRepository)
+    private readonly categoryRepository: ICategoryRepository,
   ) {}
 
   async execute(dto: CreateNewsDto): Promise<NewsResponseDto> {
@@ -42,6 +50,8 @@ export class CreateNewsUseCase {
       subtitle: dto.subtitle,
       content: dto.content,
       excerpt: dto.excerpt,
+      isFeatured: dto.isFeatured,
+      categoryId: dto.categoryId,
       authorId: dto.authorId,
       featuredImageUrl: dto.featuredImageUrl,
       featuredImageAlt: dto.featuredImageAlt,
@@ -56,7 +66,27 @@ export class CreateNewsUseCase {
     // 5. Save to repository
     await this.newsRepository.save(news);
 
-    // 6. Return DTO
-    return NewsMapper.toDto(news);
+    // 6. Handle tags (if provided)
+    let tagEntities = [];
+    if (dto.tags && dto.tags.length > 0) {
+      // Find or create tags by names
+      tagEntities = await this.tagRepository.findOrCreateByNames(dto.tags);
+      const tagIds = tagEntities.map((tag) => tag.id);
+
+      // Associate tags with news
+      await this.newsRepository.addTagsToNews(news.id, tagIds);
+    }
+
+    // 7. Get category (if exists)
+    const category = dto.categoryId 
+      ? await this.categoryRepository.findById(dto.categoryId)
+      : null;
+
+    // 8. Return DTO
+    return NewsMapper.toDto(
+      news,
+      category ? CategoryMapper.toDto(category) : null,
+      TagMapper.toListDto(tagEntities),
+    );
   }
 }
