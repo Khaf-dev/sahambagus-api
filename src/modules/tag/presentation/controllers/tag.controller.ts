@@ -9,6 +9,15 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse as ApiResponseSwagger,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger'
+
 import {
   CreateTagUseCase,
   ListTagsUseCase,
@@ -28,7 +37,7 @@ class PopularTagsQueryDto {
   @Max(50)
   limit?: number = 10;
 }
-
+@ApiTags('Tags')
 @Controller('tags')
 export class TagController {
   constructor(
@@ -44,6 +53,12 @@ export class TagController {
    */
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    summary: 'Create tag',
+    description: 'Manually create a new tag. Tags are also auto-created when creating news/analysis'
+  })
+  @ApiResponseSwagger({ status: 201, description: 'Tag created successfully' })
+  @ApiResponseSwagger({ status: 400, description: 'Invalid input data or duplicate' })
   async create(@Body() dto: CreateTagRequestDto) {
     const result = await this.createTagUseCase.execute(dto);
     return ApiResponse.success(result);
@@ -54,6 +69,11 @@ export class TagController {
    * List all tags (alphabetically)
    */
   @Get()
+  @ApiOperation({
+    summary: 'List all tags',
+    description: 'Get all sorted alphabetically by name'
+  })
+  @ApiResponseSwagger({ status: 200, description: 'Tags retrieved successfully' })
   async list() {
     const result = await this.listTagsUseCase.execute();
     return ApiResponse.success(result);
@@ -64,6 +84,12 @@ export class TagController {
    * Get popular tags by usage count
    */
   @Get('popular')
+  @ApiOperation({
+    summary: 'Get popular tags',
+    description: 'Get most used tags with usage count across news and analysis. Useful for trending topics'
+  })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Max tags to return (default: 10, max: 50) '})
+  @ApiResponseSwagger({ status: 200, description: 'Popular tags retrieved successfully' })
   async getPopular(@Query() query: PopularTagsQueryDto) {
     const result = await this.getPopularTagsUseCase.execute(query.limit);
     return ApiResponse.success(result);
@@ -75,6 +101,13 @@ export class TagController {
    */
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({
+    summary: 'Delete tag',
+    description: 'Hard delete tag and remove all associations with news/analysis'
+  })
+  @ApiParam({ name: 'id', description: 'Tag UUID' })
+  @ApiResponseSwagger({ status: 204, description: 'Tag deleted successfully' })
+  @ApiResponseSwagger({ status: 404, description: 'Tag not found' })
   async delete(@Param('id') id: string) {
     await this.deleteTagUseCase.execute(id);
   }

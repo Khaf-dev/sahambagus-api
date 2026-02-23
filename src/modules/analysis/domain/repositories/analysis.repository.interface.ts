@@ -10,6 +10,7 @@ export interface FindManyOptions {
   categoryId?: string;
   tagId?: string;
   stockTicker?: string;  // ← Analysis-specific
+  stockTickers?: string[];
   analysisType?: string; // ← Analysis-specific
   dateFrom?: string;
   dateTo?: string;
@@ -25,6 +26,7 @@ export interface CountOptions {
   categoryId?: string;
   tagId?: string;
   stockTicker?: string;  // ← Analysis-specific
+  stockTickers?: string[];
   analysisType?: string; // ← Analysis-specific
   includeDeleted?: boolean;
 }

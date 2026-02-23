@@ -192,8 +192,10 @@ model Analysis {
   // Relations
   //  author User? @relation("AnalysisAuthor", fields: [authorId], references: [id], onDelete: SetNull)
   //  editor User? @relation("AnalysisEditor", fields: [editorId], references: [id], onDelete: SetNull)
-  analysisTags AnalysisTag[]
-  category     Category?     @relation(fields: [categoryId], references: [id])
+
+  // tag          AnalysisTag[]
+  tags     AnalysisTag[] // <== TADINYA BERMASALAH KARENA PAKAI analysisTags bukan tags
+  category Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
 
   @@index([slug], name: "idx_analysis_slug")
   @@index([status], name: "idx_analysis_status")

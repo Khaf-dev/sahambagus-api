@@ -9,6 +9,14 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse as ApiResponseSwagger,
+  ApiParam,
+} from '@nestjs/swagger';
+
 import {
   CreateCategoryUseCase,
   UpdateCategoryUseCase,
@@ -22,6 +30,7 @@ import {
 } from '../dtos';
 import { ApiResponse } from '../../../../shared/response/api-response';
 
+@ApiTags('Categories')
 @Controller('categories')
 export class CategoryController {
   constructor(
@@ -38,6 +47,12 @@ export class CategoryController {
    */
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    summary: 'Create category',
+    description: 'Create a new content category with name, description, color, and icon'
+  })
+  @ApiResponseSwagger({ status: 201, description: 'Category created successfully' })
+  @ApiResponseSwagger({ status: 400, description: 'Invalid input data or duplicate name' })
   async create(@Body() dto: CreateCategoryRequestDto) {
     const result = await this.createCategoryUseCase.execute(dto);
     return ApiResponse.success(result);
@@ -48,6 +63,11 @@ export class CategoryController {
    * List all categories
    */
   @Get()
+  @ApiOperation({
+    summary: 'List categories',
+    description: 'Get all categories sorted alphabetically. Exclude soft-deleted categories'
+  })
+  @ApiResponseSwagger({ status: 200, description: 'Categories retrieved successfully' })
   async list() {
     const result = await this.listCategoriesUseCase.execute();
     return ApiResponse.success(result);
@@ -58,6 +78,13 @@ export class CategoryController {
    * Get category by slug
    */
   @Get(':slug')
+  @ApiOperation({
+    summary: 'Get category by slug',
+    description: 'Get single category by slug'
+  })
+  @ApiParam({ name: 'slug', description: 'Category slug', example: 'stocks' })
+  @ApiResponseSwagger({ status: 200, description: 'Category retrieved successfully' })
+  @ApiResponseSwagger({ status: 404, description: 'Category not found' })
   async getBySlug(@Param('slug') slug: string) {
     const result = await this.getCategoryUseCase.execute(slug);
     return ApiResponse.success(result);
@@ -68,6 +95,14 @@ export class CategoryController {
    * Update category
    */
   @Patch(':id')
+  @ApiOperation({
+    summary: 'Update category',
+    description: 'Update category details (name, description, color, icon)'
+  })
+  @ApiParam({ name: 'id', description: 'Category UUID' })
+  @ApiResponseSwagger({ status: 200, description: 'Category updated successfully' })
+  @ApiResponseSwagger({ status: 404, description: 'Category not found' })
+  @ApiResponseSwagger({ status: 400, description: 'Invalid input data' })
   async update(
     @Param('id') id: string,
     @Body() dto: UpdateCategoryRequestDto,
@@ -82,6 +117,13 @@ export class CategoryController {
    */
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({
+    summary: 'Delete category',
+    description: 'Soft delete category. Sets deletedAt timestamp'
+  })
+  @ApiParam({ name: 'id', description: 'Category UUID' })
+  @ApiResponseSwagger({ status: 204, description: 'Category deleted successfully' })
+  @ApiResponseSwagger({ status: 404, description: 'Category not found' })
   async delete(@Param('id') id: string) {
     await this.deleteCategoryUseCase.execute(id);
   }

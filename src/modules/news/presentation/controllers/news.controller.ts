@@ -11,6 +11,13 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse as ApiResponseSwagger,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
+import {
   CreateNewsUseCase,
   UpdateNewsUseCase,
   GetNewsBySlugUseCase,
@@ -28,6 +35,7 @@ import {
 } from '../dtos';
 import { ApiResponse } from '../../../../shared/response/api-response';
 
+@ApiTags('News')
 @Controller('news')
 export class NewsController {
   constructor(
@@ -48,6 +56,9 @@ export class NewsController {
    */
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Create news article', description: 'Create a new news article in DRAFT status' })
+  @ApiResponseSwagger({ status: 201, description: 'News created successfully' })
+  @ApiResponseSwagger({ status: 400, description: 'Invalid input data' })
   async create(@Body() dto: CreateNewsRequestDto) {
     const result = await this.createNewsUseCase.execute(dto);
     return ApiResponse.success(result);
@@ -58,6 +69,13 @@ export class NewsController {
    * List news with pagination and filters
    */
   @Get()
+  @ApiOperation({ summary: 'List news articles', description: 'Get paginated list of with filters'})
+  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number (default: 1)' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Items per page (default: 10) '})
+  @ApiQuery({ name: 'status', required: false, enum: ['DRAFT', 'REVIEW', 'PUBLISHED', 'ARCHIVED'] })
+  @ApiQuery({ name: 'categoryId', required: false, type: String })
+  @ApiQuery({ name: 'isFeatured', required: false, type: Boolean })
+  @ApiResponseSwagger({ status: 200, description: 'News list retrieved successfully' })
   async list(@Query() query: ListNewsQueryDto) {
     const result = await this.listNewsUseCase.execute(query);
     return ApiResponse.success(result);
@@ -68,6 +86,8 @@ export class NewsController {
    * Gete featured news (for homepage)
    */
   @Get('featured')
+  @ApiOperation({ summary: 'Get featured news', description: 'Get featured published news (limit: 5)' })
+  @ApiResponseSwagger({ status: 200, description: 'Featured news retrieved successfully' })
   async getFeatured() {
     const result = await this.getFeaturedNewsUseCase.execute(5);
     return ApiResponse.success(result);
@@ -100,6 +120,10 @@ export class NewsController {
    * Increments view count
    */
   @Get(':slug')
+  @ApiOperation({ summary: 'Get news by slug', description: 'Get single news article by slug. Increment view count for published articles.' })
+  @ApiParam({ name: 'slug', description: 'News slug', example: 'bbri-catat-laba-bersih-rp-65-triliun' })
+  @ApiResponseSwagger({ status: 200, description: 'News retrieved successfully' })
+  @ApiResponseSwagger({ status: 400, description: 'News not found' })
   async getBySlug(@Param('slug') slug: string) {
     const result = await this.getNewsBySlugUseCase.execute(slug);
     return ApiResponse.success(result);

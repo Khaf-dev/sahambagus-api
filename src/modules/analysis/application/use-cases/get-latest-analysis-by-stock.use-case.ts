@@ -7,26 +7,14 @@ import { ITagRepository } from '../../../tag/domain';
 import { CategoryMapper } from '../../../category/application/mappers';
 import { TagMapper } from '../../../tag/application/mappers';
 
-export interface ListAnalysisOptions {
-  page?: number;
-  limit?: number;
-  status?: string;
-  authorId?: string;
-  searchTerm?: string;
-  isFeatured?: boolean;
-  categoryId?: string;
-  tagId?: string;
-  stockTicker?: string;   // ← Analysis-specific
-  stockTickers?: string[];
-  analysisType?: string;  // ← Analysis-specific
-  dateFrom?: string;
-  dateTo?: string;
-  sortBy?: 'createdAt' | 'publishedAt' | 'updatedAt' | 'viewCount' | 'title';
-  sortOrder?: 'asc' | 'desc';
-}
-
+/**
+ * GetLatestAnalysisByStockUseCase
+ * 
+ * Get the latest analysis for a specific stock ticker.
+ * Useful for showing "Latest BBRI Analysis" on stock detail pages.
+ */
 @Injectable()
-export class ListAnalysisUseCase {
+export class GetLatestAnalysisByStockUseCase {
   constructor(
     @Inject(IAnalysisRepository)
     private readonly analysisRepository: IAnalysisRepository,
@@ -36,26 +24,21 @@ export class ListAnalysisUseCase {
     private readonly tagRepository: ITagRepository,
   ) {}
 
-  async execute(options: ListAnalysisOptions) {
-    // 1. Get analysis list
-    const analysisList = await this.analysisRepository.findMany(options);
-
-    // 2. Get total count
-    const total = await this.analysisRepository.count({
-      status: options.status,
-      authorId: options.authorId,
-      isFeatured: options.isFeatured,
-      categoryId: options.categoryId,
-      tagId: options.tagId,
-      stockTicker: options.stockTicker,
-      stockTickers: options.stockTickers,
-      analysisType: options.analysisType,
+  async execute(stockTicker: string, limit: number = 5): Promise<AnalysisListItemDto[]> {
+    // Get latest published analysis for this stock
+    const analysisList = await this.analysisRepository.findMany({
+      stockTicker,
+      status: 'PUBLISHED',
+      sortBy: 'publishedAt',
+      sortOrder: 'desc',
+      limit,
+      page: 1,
     });
 
-    // 3. Get all unique category IDs
+    // Get all unique category IDs
     const categoryIds = [...new Set(analysisList.map((a) => a.categoryId).filter(Boolean))] as string[];
 
-    // 4. Get all categories in one query
+    // Get all categories
     const categories = await Promise.all(
       categoryIds.map((id) => this.categoryRepository.findById(id))
     );
@@ -63,7 +46,7 @@ export class ListAnalysisUseCase {
       categories.filter(Boolean).map((c) => [c!.id, CategoryMapper.toDto(c!)])
     );
 
-    // 5. Get tags for all analysis items
+    // Get tags for all analysis items
     const analysisWithData = await Promise.all(
       analysisList.map(async (analysis) => {
         const tags = await this.analysisRepository.getTagsForAnalysis(analysis.id);
@@ -77,21 +60,6 @@ export class ListAnalysisUseCase {
       })
     );
 
-    // 6. Calculate pagination
-    const page = options.page || 1;
-    const limit = options.limit || 10;
-    const totalPages = Math.ceil(total / limit);
-
-    return {
-      data: analysisWithData,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages,
-        hasNext: page < totalPages,
-        hasPrev: page > 1,
-      },
-    };
+    return analysisWithData;
   }
 }
