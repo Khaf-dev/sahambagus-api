@@ -13,6 +13,7 @@ export class AnalysisResponseDto {
   
   stockTicker: string;       // ← Analysis-specific
   analysisType: string;      // ← Analysis-specific
+  marketSentiment: string;
   targetPrice: number | null; // ← Analysis-specific
   
   categoryId: string | null;

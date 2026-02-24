@@ -6,6 +6,7 @@ export class CreateAnalysisDto {
   isFeatured?: boolean;
   stockTicker: string;       // ← Analysis-specific
   analysisType: string;      // ← Analysis-specific
+  marketSentiment: string;
   targetPrice?: number;      // ← Analysis-specific
   categoryId?: string;
   tags?: string[];

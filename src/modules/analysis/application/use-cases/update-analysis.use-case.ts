@@ -5,6 +5,7 @@ import {
   AnalysisNotFoundException,
   AnalysisType,
   StockTicker,
+  MarketSentiment,
 } from '../../domain';
 import { UpdateAnalysisDto, AnalysisResponseDto } from '../dtos';
 import { AnalysisMapper } from '../mappers';
@@ -43,6 +44,10 @@ export class UpdateAnalysisUseCase {
       ? AnalysisType.fromString(dto.analysisType) 
       : undefined;
 
+    const marketSentiment = dto.marketSentiment
+      ? MarketSentiment.fromString(dto.marketSentiment)
+      : undefined;
+
     // 3. Update analysis entity
     analysis.update({
       title: dto.title,
@@ -51,6 +56,7 @@ export class UpdateAnalysisUseCase {
       excerpt: dto.excerpt,
       stockTicker,
       analysisType,
+      marketSentiment,
       targetPrice: dto.targetPrice,
       categoryId: dto.categoryId,
       featuredImageUrl: dto.featuredImageUrl,

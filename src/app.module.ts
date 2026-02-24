@@ -8,6 +8,7 @@ import { CategoryModule } from './modules/category/category.module';
 import { TagModule } from './modules/tag/tag.module';
 import { AnalysisModule } from './modules/analysis/analysis.module';
 import appConfig from './config/app.config';
+import { UploadModule } from './shared/upload';
 
 /**
  * Main Applicant Module
@@ -29,6 +30,7 @@ import appConfig from './config/app.config';
     //Database shared module
     DatabaseModule,
     RedisModule,
+    UploadModule,
 
     // Features
     HealthModule,

@@ -25,6 +25,12 @@ enum AnalysisType {
   MARKET_UPDATE
 }
 
+enum MarketSentiment {
+  BULLISH
+  BEARISH
+  NEUTRAL
+}
+
 enum ContentStatus {
   DRAFT
   REVIEW
@@ -153,9 +159,10 @@ model Analysis {
   excerpt  String? @db.VarChar(500)
 
   // Analysis-specific fields
-  stockTicker  String       @map("stock_ticker") @db.VarChar(20)
-  analysisType AnalysisType @map("analysis_type")
-  targetPrice  Decimal?     @map("target_price") @db.Decimal(15, 2)
+  stockTicker     String          @map("stock_ticker") @db.VarChar(20)
+  analysisType    AnalysisType    @map("analysis_type")
+  marketSentiment MarketSentiment @map("market_sentiment")
+  targetPrice     Decimal?        @map("target_price") @db.Decimal(15, 2)
 
   // Media
   isFeatured       Boolean @default(false) @map("is_featured")

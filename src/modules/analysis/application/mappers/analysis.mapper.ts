@@ -22,6 +22,7 @@ export class AnalysisMapper {
       
       stockTicker: analysis.stockTicker.toString(),
       analysisType: analysis.analysisType.toString(),
+      marketSentiment: analysis.marketSentiment.toString(),
       targetPrice: analysis.targetPrice,
       
       categoryId: analysis.categoryId,
@@ -65,6 +66,7 @@ export class AnalysisMapper {
       
       stockTicker: analysis.stockTicker.toString(),
       analysisType: analysis.analysisType.toString(),
+      marketSentiment: analysis.marketSentiment.toString(),
       targetPrice: analysis.targetPrice,
       
       categoryId: analysis.categoryId,

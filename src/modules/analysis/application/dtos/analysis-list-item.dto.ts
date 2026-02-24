@@ -11,6 +11,7 @@ export class AnalysisListItemDto {
   
   stockTicker: string;
   analysisType: string;
+  marketSentiment: string;
   targetPrice: number | null;
   
   categoryId: string | null;

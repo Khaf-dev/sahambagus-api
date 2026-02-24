@@ -5,6 +5,7 @@ import {
   IAnalysisRepository,
   SlugAlreadyExistsException,
   AnalysisType,
+  MarketSentiment,
   StockTicker,
 } from '../../domain';
 import { Slug } from '../../../news/domain/value-objects/slug.vo';
@@ -39,6 +40,7 @@ export class CreateAnalysisUseCase {
     // 3. Create value objects
     const stockTicker = StockTicker.create(dto.stockTicker);
     const analysisType = AnalysisType.fromString(dto.analysisType);
+    const marketSentiment = MarketSentiment.fromString(dto.marketSentiment);
 
     // 4. Create entity
     const analysis = AnalysisEntity.create({
@@ -51,6 +53,7 @@ export class CreateAnalysisUseCase {
       isFeatured: dto.isFeatured,
       stockTicker,
       analysisType,
+      marketSentiment,
       targetPrice: dto.targetPrice,
       categoryId: dto.categoryId,
       authorId: dto.authorId,

@@ -47,6 +47,11 @@ export class UpdateAnalysisRequestDto {
   @IsIn(['TECHNICAL', 'FUNDAMENTAL', 'SENTIMENT', 'MARKET_UPDATE'])
   analysisType?: string;
 
+  @IsString()
+  @IsOptional()
+  @IsIn(['BULLISH', 'BEARISH', 'NEUTRAL'])
+  marketSentiment?: string;
+
   @IsNumber()
   @IsOptional()
   @Min(0)

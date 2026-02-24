@@ -6,6 +6,7 @@ export class UpdateAnalysisDto {
   isFeatured?: boolean;
   stockTicker?: string;
   analysisType?: string;
+  marketSentiment?: string;
   targetPrice?: number;
   categoryId?: string;
   tags?: string[];

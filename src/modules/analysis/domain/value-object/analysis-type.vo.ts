@@ -40,7 +40,7 @@ export class AnalysisType {
         return this.value === 'TECHNICAL';
     }
 
-    ifFundamental(): boolean {
+    isFundamental(): boolean {
         return this.value === 'FUNDAMENTAL';
     }
 

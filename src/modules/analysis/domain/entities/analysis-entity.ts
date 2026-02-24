@@ -1,6 +1,6 @@
 import { Slug } from '../../../news/domain/value-objects/slug.vo';
 import { ContentStatus } from '../../../news/domain/value-objects/content-status.vo';
-import { AnalysisType, StockTicker } from '../value-object';
+import { AnalysisType, MarketSentiment, StockTicker } from '../value-object';
 
 /**
  * Analysis Entity
@@ -20,6 +20,7 @@ export class AnalysisEntity {
     private _isFeatured: boolean,
     private _stockTicker: StockTicker,
     private _analysisType: AnalysisType,
+    private _marketSentiment: MarketSentiment,
     private _targetPrice: number | null,
     private _categoryId: string | null,
     private _featuredImageUrl: string | null,
@@ -52,6 +53,7 @@ export class AnalysisEntity {
     isFeatured?: boolean;
     stockTicker: StockTicker;
     analysisType: AnalysisType;
+    marketSentiment: MarketSentiment;
     targetPrice?: number | null;
     categoryId?: string | null;
     authorId: string;
@@ -72,6 +74,7 @@ export class AnalysisEntity {
       props.isFeatured || false,
       props.stockTicker,
       props.analysisType,
+      props.marketSentiment,
       props.targetPrice || null,
       props.categoryId || null,
       props.featuredImageUrl || null,
@@ -100,6 +103,7 @@ export class AnalysisEntity {
     isFeatured: boolean;
     stockTicker: string;
     analysisType: string;
+    marketSentiment: string;
     targetPrice: number | null;
     categoryId: string | null;
     featuredImageUrl: string | null;
@@ -126,6 +130,7 @@ export class AnalysisEntity {
       props.isFeatured,
       StockTicker.create(props.stockTicker),
       AnalysisType.fromString(props.analysisType),
+      MarketSentiment.fromString(props.marketSentiment),
       props.targetPrice,
       props.categoryId,
       props.featuredImageUrl,
@@ -177,6 +182,10 @@ export class AnalysisEntity {
 
   get analysisType(): AnalysisType {
     return this._analysisType;
+  }
+
+  get marketSentiment(): MarketSentiment {
+    return this._marketSentiment;
   }
 
   get targetPrice(): number | null {
@@ -242,6 +251,7 @@ export class AnalysisEntity {
     excerpt?: string | null;
     stockTicker?: StockTicker;
     analysisType?: AnalysisType;
+    marketSentiment?: MarketSentiment;
     targetPrice?: number | null;
     categoryId?: string | null;
     featuredImageUrl?: string | null;
@@ -260,6 +270,7 @@ export class AnalysisEntity {
     if (props.excerpt !== undefined) this._excerpt = props.excerpt;
     if (props.stockTicker !== undefined) this._stockTicker = props.stockTicker;
     if (props.analysisType !== undefined) this._analysisType = props.analysisType;
+    if (props.marketSentiment !== undefined) this._marketSentiment = props.marketSentiment;
     if (props.targetPrice !== undefined) this._targetPrice = props.targetPrice;
     if (props.categoryId !== undefined) this._categoryId = props.categoryId;
     if (props.featuredImageUrl !== undefined) this._featuredImageUrl = props.featuredImageUrl;
