@@ -36,6 +36,7 @@ import {
   UpdateAnalysisRequestDto,
   ListAnalysisQueryDto,
 } from '../dtos';
+import { Public } from 'src/modules/auth/infrastructure/decorators';
 import { ApiResponse } from '../../../../shared/response/api-response';
 
 @ApiTags('Analysis')
@@ -76,6 +77,7 @@ export class AnalysisController {
    * List analysis with pagination and filters
    */
   @Get()
+  @Public()
   @ApiOperation({ 
     summary: 'List stock analysis',
     description: 'Get paginated list of stock analysis with advanced filters (ticker, type, category, tags)'
@@ -100,6 +102,7 @@ export class AnalysisController {
    * Penting : Must be sebelum /:slug rute
    */
   @Get('featured')
+  @Public()
   @ApiOperation({
     summary: 'Get featured analysis',
     description: 'Get featured published stock analysis (limit 5) - for homepage hero section'
@@ -153,6 +156,7 @@ export class AnalysisController {
    */
 
   @Get('stock/:ticker')
+  @Public()
   @ApiOperation({
     summary: 'Get latest analysis by stock',
     description: 'Get the latest 5 published analysis for a specific stock ticker. Useful for stock detail pages.'
@@ -170,6 +174,7 @@ export class AnalysisController {
    * Increments view count
    */
   @Get(':slug')
+  @Public()
   @ApiOperation({
     summary: 'Get analysis by slug',
     description: 'Get single stock analysis by slug. Increment view count for published analysis'

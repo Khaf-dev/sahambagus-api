@@ -28,6 +28,7 @@ import {
   CreateCategoryRequestDto,
   UpdateCategoryRequestDto,
 } from '../dtos';
+import { Public } from 'src/modules/auth/infrastructure/decorators';
 import { ApiResponse } from '../../../../shared/response/api-response';
 
 @ApiTags('Categories')
@@ -63,6 +64,7 @@ export class CategoryController {
    * List all categories
    */
   @Get()
+  @Public()
   @ApiOperation({
     summary: 'List categories',
     description: 'Get all categories sorted alphabetically. Exclude soft-deleted categories'
@@ -78,6 +80,7 @@ export class CategoryController {
    * Get category by slug
    */
   @Get(':slug')
+  @Public()
   @ApiOperation({
     summary: 'Get category by slug',
     description: 'Get single category by slug'

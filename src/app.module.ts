@@ -7,8 +7,12 @@ import { NewsModule } from './modules/news/news.module';
 import { CategoryModule } from './modules/category/category.module';
 import { TagModule } from './modules/tag/tag.module';
 import { AnalysisModule } from './modules/analysis/analysis.module';
+import { UserModule } from './modules/user/user.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { JwtAuthGuard } from './modules/auth/infrastructure/guards';
 import appConfig from './config/app.config';
 import { UploadModule } from './shared/upload';
+import { APP_GUARD } from '@nestjs/core';
 
 /**
  * Main Applicant Module
@@ -37,7 +41,15 @@ import { UploadModule } from './shared/upload';
     NewsModule,
     CategoryModule,
     TagModule,
-    AnalysisModule
+    AnalysisModule,
+    UserModule,
+    AuthModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
   ],
 })
 export class AppModule {}

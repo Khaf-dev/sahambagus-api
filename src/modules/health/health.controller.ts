@@ -1,8 +1,13 @@
 import { Controller, Get } from "@nestjs/common";
+import { ApiTags, ApiOperation } from "@nestjs/swagger";
+import { Public } from "../auth/infrastructure/decorators";
+import {
+    HealthCheck,
+    HealthCheckService,
+    PrismaHealthIndicator,
+} from '@nestjs/terminus';
 import { PrismaService } from "src/shared/database";
 import { RedisService } from "src/shared/cache";
-import { ApiResponse } from "src/shared/response/api-response";
-import { timestamp } from "rxjs";
 
 /**
  * Health check controller
@@ -11,51 +16,39 @@ import { timestamp } from "rxjs";
  * - /health/live : Liveness check (is app running?)
  * - /health/ready : Readiness check (is app ready for traffic?)
  */
+
+@ApiTags('Health')
 @Controller('health')
 export class HealthController {
     constructor(
-        private readonly prisma: PrismaService,
-        private readonly redis: RedisService,
+        private health: HealthCheckService,
+        private prismaHealth: PrismaHealthIndicator,
+        private prisma: PrismaService,
+        private redis: RedisService,
     ) {}
 
-    /**
-     * Liveness check
-     * Is the application running?
-     * Used by: Load balancer, Kubernetes liveness probe
-     */
     @Get('live')
-    liveness() {
-        return ApiResponse.success({
-            status: 'ok',
-            timestamp: new Date().toISOString(),
-            uptime: process.uptime(),
-        });
+    @Public()
+    @ApiOperation({ summary: 'Liveness probe' })
+    async liveness() {
+        return { status: 'ok', timestamp: new Date().toISOString() };
     }
 
-    /**
-     * Readiness check
-     * Is the applicatiion ready to accept traffic?
-     * CChecks: Database + Redis connectivity
-     * Used By: Kubernetes readiness probe
-     */
     @Get('ready')
+    @Public()
+    @HealthCheck()
+    @ApiOperation({ summary: 'Readiness probe' })
     async readiness() {
-        const dbHealthy = await this.prisma.isHealthy();
-        const redisHealthy = await this.redis.isReady();
-
-        const allHealthy = dbHealthy && redisHealthy;
-
-        return ApiResponse.success({
-            status: allHealthy ? 'ok' : 'degraded',
-            timestamp: new Date().toISOString(),
-            services: {
-                database: {
-                    status: dbHealthy ? 'ok' : 'error',
-                },
-                redis: {
-                    status: redisHealthy ? 'ok' : 'error',
-                },
+        return this.health.check([
+            () => this.prismaHealth.pingCheck('database', this.prisma),
+            async () => {
+                const isHealthy = await this.redis.ping();
+                return {
+                    redis: {
+                        status: isHealthy ? 'up' : 'down',
+                    },
+                };
             },
-        });
+        ]);
     }
 }

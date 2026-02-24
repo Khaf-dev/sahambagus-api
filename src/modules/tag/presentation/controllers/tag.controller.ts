@@ -24,6 +24,7 @@ import {
   GetPopularTagsUseCase,
   DeleteTagUseCase,
 } from '../../application';
+import { Public } from 'src/modules/auth/infrastructure/decorators';
 import { CreateTagRequestDto } from '../dtos';
 import { ApiResponse } from '../../../../shared/response/api-response';
 import { Type } from 'class-transformer';
@@ -69,6 +70,7 @@ export class TagController {
    * List all tags (alphabetically)
    */
   @Get()
+  @Public()
   @ApiOperation({
     summary: 'List all tags',
     description: 'Get all sorted alphabetically by name'
@@ -84,6 +86,7 @@ export class TagController {
    * Get popular tags by usage count
    */
   @Get('popular')
+  @Public()
   @ApiOperation({
     summary: 'Get popular tags',
     description: 'Get most used tags with usage count across news and analysis. Useful for trending topics'

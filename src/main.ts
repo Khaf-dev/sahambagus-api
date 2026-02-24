@@ -61,6 +61,7 @@ async function bootstrap() {
     .setDescription('Financial News & Stock Analysis API - Production-ready REST API with Clean Architecture')
     .setVersion('1.0.0')
     .addTag('Health', 'Health check endpoints')
+    .addTag('Auth', 'Authentication & Authorization')
     .addTag('News', 'Financial news management')
     .addTag('Analysis', 'Stock analysis management')
     .addTag('Categories', 'Content categorization')

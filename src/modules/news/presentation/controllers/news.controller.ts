@@ -33,6 +33,7 @@ import {
   UpdateNewsRequestDto,
   ListNewsQueryDto,
 } from '../dtos';
+import { Public } from 'src/modules/auth/infrastructure/decorators';
 import { ApiResponse } from '../../../../shared/response/api-response';
 
 @ApiTags('News')
@@ -69,6 +70,7 @@ export class NewsController {
    * List news with pagination and filters
    */
   @Get()
+  @Public()
   @ApiOperation({ summary: 'List news articles', description: 'Get paginated list of with filters'})
   @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number (default: 1)' })
   @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Items per page (default: 10) '})
@@ -86,6 +88,7 @@ export class NewsController {
    * Gete featured news (for homepage)
    */
   @Get('featured')
+  @Public()
   @ApiOperation({ summary: 'Get featured news', description: 'Get featured published news (limit: 5)' })
   @ApiResponseSwagger({ status: 200, description: 'Featured news retrieved successfully' })
   async getFeatured() {
@@ -120,6 +123,7 @@ export class NewsController {
    * Increments view count
    */
   @Get(':slug')
+  @Public()
   @ApiOperation({ summary: 'Get news by slug', description: 'Get single news article by slug. Increment view count for published articles.' })
   @ApiParam({ name: 'slug', description: 'News slug', example: 'bbri-catat-laba-bersih-rp-65-triliun' })
   @ApiResponseSwagger({ status: 200, description: 'News retrieved successfully' })
