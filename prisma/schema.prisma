@@ -87,8 +87,8 @@ model News {
   viewCount Int @default(0) @map("view_count")
 
   // Relations
-  //  author User? @relation("NewsAuthor", fields: [authorId], references: [id], onDelete: SetNull)
-  //  editor User? @relation("NewsEditor", fields: [editorId], references: [id], onDelete: SetNull)
+  author User? @relation("NewsAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  editor User? @relation("NewsEditor", fields: [editorId], references: [id], onDelete: SetNull)
   category Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   tags     NewsTag[]
 
@@ -198,8 +198,8 @@ model Analysis {
   viewCount Int @default(0) @map("view_count")
 
   // Relations
-  //  author User? @relation("AnalysisAuthor", fields: [authorId], references: [id], onDelete: SetNull)
-  //  editor User? @relation("AnalysisEditor", fields: [editorId], references: [id], onDelete: SetNull)
+  editor User? @relation("AnalysisEditor", fields: [editorId], references: [id], onDelete: SetNull)
+  author User? @relation("AnalysisAuthor", fields: [authorId], references: [id], onDelete: SetNull)
 
   // tag          AnalysisTag[]
   tags     AnalysisTag[] // <== TADINYA BERMASALAH KARENA PAKAI analysisTags bukan tags
@@ -282,10 +282,10 @@ model User {
   deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
 
   // Relations
-  //  newsAsAuthor     News[]     @relation("NewsAuthor")
-  //  newsAsEditor     News[]     @relation("NewsEditor")
-  //  analysisAsAuthor Analysis[] @relation("AnalysisAuthor")
-  //  analysisAsEditor Analysis[] @relation("AnalysisEditor")
+  newsAsAuthor     News[]     @relation("NewsAuthor")
+  newsAsEditor     News[]     @relation("NewsEditor")
+  analysisAsAuthor Analysis[] @relation("AnalysisAuthor")
+  analysisAsEditor Analysis[] @relation("AnalysisEditor")
 
   // @@index([email], name: "idx_user_email")
   // @@index([role], name: "idx_user_role")

@@ -62,7 +62,18 @@ export class ListNewsUseCase {
       categories.filter(Boolean).map((c) => [c!.id, CategoryMapper.toDto(c!)])
     )
 
-    // 5. Get tags for all news items
+    // 5. Get all unique author IDs
+    const authorIds = [...new Set(newsList.map((n) => n.authorId).filter(Boolean))] as string[];
+
+    // 6. Get all authors in one query
+    const authors = await Promise.all(
+      authorIds.map((id) => this.newsRepository.getAuthorForNews(id))
+    );
+    const authorMap = new Map(
+      authors.filter(Boolean).map((a) => [a!.id, a!])
+    );
+
+    // 7. Get tags for all news items
     const newsWithData = await Promise.all(
       newsList.map(async (news) => {
         const tags = await this.newsRepository.getTagsForNews(news.id);
@@ -72,17 +83,18 @@ export class ListNewsUseCase {
           news,
           news.categoryId ? categoryMap.get(news.categoryId) : null,
           TagMapper.toListDto(tagEntities),
+          news.authorId ? authorMap.get(news.authorId) : null,
         );
       })
     );
 
-    // 6. Calculate pagination
+    // 8. Calculate pagination
     const page = options.page || 1;
     const limit = options.limit || 10;
     const totalPages = Math.ceil(total / limit);
 
     return {
-      data: newsWithData,
+      items: newsWithData,
       pagination: {
         page,
         limit,

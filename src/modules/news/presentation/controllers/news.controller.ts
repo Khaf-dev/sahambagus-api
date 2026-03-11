@@ -27,6 +27,8 @@ import {
   DeleteNewsUseCase,
   GetFeaturedNewsUseCase,
   ToggleFeaturedUseCase,
+  RejectNewsUseCase,
+  ArchiveNewsUseCase,
 } from '../../application';
 import {
   CreateNewsRequestDto,
@@ -35,6 +37,7 @@ import {
 } from '../dtos';
 import { Public } from 'src/modules/auth/infrastructure/decorators';
 import { ApiResponse } from '../../../../shared/response/api-response';
+import { response } from 'express';
 
 @ApiTags('News')
 @Controller('news')
@@ -46,6 +49,8 @@ export class NewsController {
     private readonly listNewsUseCase: ListNewsUseCase,
     private readonly publishNewsUseCase: PublishNewsUseCase,
     private readonly submitForReviewUseCase: SubmitForReviewUseCase,
+    private readonly rejectNewsUseCase: RejectNewsUseCase,
+    private readonly archiveNewsUseCase: ArchiveNewsUseCase,
     private readonly deleteNewsUseCase: DeleteNewsUseCase,
     private readonly getFeaturedNewsUseCase: GetFeaturedNewsUseCase,
     private readonly toggleFeaturedUseCase: ToggleFeaturedUseCase,
@@ -171,6 +176,26 @@ export class NewsController {
     
     const result = await this.publishNewsUseCase.execute(id, editorId);
     return ApiResponse.success(result);
+  }
+
+  /**
+   * POST /api/v1/news/:id/reject
+   * Reject news (REVIEW -> DRAFT)
+   */
+  @Post(':id/reject')
+  async reject(@Param('id') id: string) {
+    await this.rejectNewsUseCase.execute(id);
+    return ApiResponse.success({ message: 'News rejected and back to draft' });
+  }
+
+  /**
+   * POST /api/v1/news/:id/archive
+   * Archive news (PUBLISHED -> ARCHIVED)
+   */
+  @Post(':id/archive')
+  async archive(@Param('id') id: string) {
+    await this.archiveNewsUseCase.execute(id);
+    return ApiResponse.success({ message: 'News archived successfully' });
   }
 
 

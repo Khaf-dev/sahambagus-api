@@ -9,6 +9,8 @@ export class AnalysisMapper {
     analysis: AnalysisEntity,
     category?: any,
     tags?: any[],
+    author?: any,
+
   ): AnalysisResponseDto {
     return {
       id: analysis.id,
@@ -37,6 +39,7 @@ export class AnalysisMapper {
       metaKeywords: analysis.metaKeywords,
       
       authorId: analysis.authorId,
+      author: author || null,
       editorId: analysis.editorId,
       
       viewCount: analysis.viewCount,
@@ -55,6 +58,8 @@ export class AnalysisMapper {
     analysis: AnalysisEntity,
     category?: any,
     tags?: any[],
+    author?: any,
+
   ): AnalysisListItemDto {
     return {
       id: analysis.id,
@@ -76,6 +81,7 @@ export class AnalysisMapper {
       featuredImageUrl: analysis.featuredImageUrl,
       
       authorId: analysis.authorId,
+      author: author || null,
       viewCount: analysis.viewCount,
       
       createdAt: analysis.createdAt.toISOString(),

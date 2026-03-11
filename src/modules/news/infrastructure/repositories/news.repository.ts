@@ -44,6 +44,14 @@ export class NewsRepository implements INewsRepository {
             tag: true,
           },
         },
+        author: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        }
       },
     });
 
@@ -61,6 +69,14 @@ export class NewsRepository implements INewsRepository {
         tags: {
           include: {
             tag: true,
+          },
+        },
+        author: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
           },
         },
       },
@@ -128,6 +144,14 @@ export class NewsRepository implements INewsRepository {
         tags: {
           include: {
             tag: true,
+          },
+        },
+        author: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
           },
         },
       },
@@ -243,6 +267,20 @@ export class NewsRepository implements INewsRepository {
 
     return await this.prisma.category.findUnique({
       where: { id: categoryId },
+    });
+  }
+
+  async getAuthorForNews(authorId: string | null): Promise<any | null> {
+    if (!authorId) return null;
+
+    return await this.prisma.user.findUnique({
+      where: { id: authorId },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+      },
     });
   }
 }

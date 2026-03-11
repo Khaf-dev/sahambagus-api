@@ -290,6 +290,17 @@ export class NewsEntity {
   }
 
   /**
+   * Reject news - send back to draft
+   */
+  reject(): void {
+    if (this._status !== ContentStatus.REVIEW) {
+      throw new Error('Can only reject news in REVIEW status');
+    }
+    this._status = ContentStatus.DRAFT;
+    this._updatedAt = new Date();
+  }
+
+  /**
    * Unpublish news (PUBLISHED → DRAFT)
    */
   unpublish(): void {

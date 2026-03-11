@@ -34,6 +34,14 @@ export class AnalysisRepository implements IAnalysisRepository {
             tag: true,
           },
         },
+        author: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
       },
     });
 
@@ -51,6 +59,14 @@ export class AnalysisRepository implements IAnalysisRepository {
         tags: {
           include: {
             tag: true,
+          },
+        },
+        author: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
           },
         },
       },
@@ -152,6 +168,14 @@ export class AnalysisRepository implements IAnalysisRepository {
         tags: {
           include: {
             tag: true,
+          },
+        },
+        author: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
           },
         },
       },
@@ -302,6 +326,20 @@ export class AnalysisRepository implements IAnalysisRepository {
 
     return await this.prisma.category.findUnique({
       where: { id: categoryId },
+    });
+  }
+
+  async getAuthorForAnalysis(authorId: string | null): Promise<any | null> {
+    if (!authorId) return null;
+
+    return await this.prisma.user.findUnique({
+      where: { id: authorId },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+      },
     });
   }
 }

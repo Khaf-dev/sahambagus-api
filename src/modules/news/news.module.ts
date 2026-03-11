@@ -15,6 +15,8 @@ import { INewsRepository } from './domain';
 import { NewsController } from './presentation/controllers';
 import { TagModule } from '../tag/tag.module';
 import { CategoryModule } from '../category/category.module';
+import { RejectNewsUseCase } from './application/use-cases/reject-news.use-case';
+import { ArchiveNewsUseCase } from './application/use-cases/archive-news.use-case';
 
 /**
  * News Module
@@ -39,6 +41,8 @@ import { CategoryModule } from '../category/category.module';
     ListNewsUseCase,
     PublishNewsUseCase,
     SubmitForReviewUseCase,
+    RejectNewsUseCase,
+    ArchiveNewsUseCase,
     DeleteNewsUseCase,
     GetFeaturedNewsUseCase,
     ToggleFeaturedUseCase,
@@ -52,6 +56,8 @@ import { CategoryModule } from '../category/category.module';
     PublishNewsUseCase,
     SubmitForReviewUseCase,
     DeleteNewsUseCase,
+    ArchiveNewsUseCase,
+    RejectNewsUseCase,
     GetFeaturedNewsUseCase,
     ToggleFeaturedUseCase,
   ],

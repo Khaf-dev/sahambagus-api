@@ -301,6 +301,29 @@ export class AnalysisEntity {
     this._updatedAt = new Date();
   }
 
+  /**
+   * Reject analysis - send back to draft
+   */
+  reject(): void {
+    if (this._status !== ContentStatus.REVIEW) {
+      throw new Error('Can only reject analysis in REVIEW status');
+    }
+    this._status = ContentStatus.DRAFT;
+    this._updatedAt = new Date();
+  }
+
+  /**
+   *  Archive analysis
+   */
+  archive(): void {
+    if (this._status !== ContentStatus.PUBLISHED) {
+      throw new Error('Can only archive analysis in published status');
+    }
+    this._status = ContentStatus.ARCHIVED;
+    this._archivedAt = new Date();
+    this._updatedAt = new Date();
+  }
+
   setFeatured(featured: boolean): void {
     if (featured && !this._status.isPublished()) {
       throw new Error('Only published analysis can be featured');

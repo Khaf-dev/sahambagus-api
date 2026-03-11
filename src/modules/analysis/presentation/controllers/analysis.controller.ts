@@ -27,6 +27,8 @@ import {
   PublishAnalysisUseCase,
   SubmitForReviewUseCase,
   DeleteAnalysisUseCase,
+  ArchiveAnalysisUseCase,
+  RejectAnalysisUseCase,
   GetFeaturedAnalysisUseCase,
   ToggleFeaturedAnalysisUseCase,
   GetLatestAnalysisByStockUseCase,
@@ -50,6 +52,8 @@ export class AnalysisController {
     private readonly publishAnalysisUseCase: PublishAnalysisUseCase,
     private readonly submitForReviewUseCase: SubmitForReviewUseCase,
     private readonly deleteAnalysisUseCase: DeleteAnalysisUseCase,
+    private readonly rejectAnalysisUseCase: RejectAnalysisUseCase,
+    private readonly archiveAnalysisUseCase: ArchiveAnalysisUseCase,
     private readonly getFeaturedAnalysisUseCase: GetFeaturedAnalysisUseCase,
     private readonly toggleFeaturedAnalysisUseCase: ToggleFeaturedAnalysisUseCase,
     private readonly getLatestAnalysisByStockUseCase: GetLatestAnalysisByStockUseCase,
@@ -243,6 +247,28 @@ export class AnalysisController {
     const result = await this.publishAnalysisUseCase.execute(id);
     return ApiResponse.success(result);
   }
+
+    /**
+   * POST /api/v1/analysis/:id/reject
+   * Reject analysis (REVIEW -> DRAFT)
+   */
+  @Post(':id/reject')
+  async reject(@Param('id') id: string) {
+    await this.rejectAnalysisUseCase.execute(id);
+    return ApiResponse.success({ message: 'Analysis rejected and back to draft' });
+  }
+
+  /**
+   * POST /api/v1/analysis/:id/archive
+   * Archive analysis (PUBLISHED -> ARCHIVED)
+   */
+  @Post(':id/archive')
+  async archive(@Param('id') id: string) {
+    await this.archiveAnalysisUseCase.execute(id);
+    return ApiResponse.success({ message: 'Analysis archived successfully' });
+  }
+
+
 
   /**
    * DELETE /api/v1/analysis/:id

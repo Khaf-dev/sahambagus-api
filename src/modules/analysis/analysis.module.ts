@@ -10,6 +10,8 @@ import {
   GetFeaturedAnalysisUseCase,
   ToggleFeaturedAnalysisUseCase,
   GetLatestAnalysisByStockUseCase,
+  RejectAnalysisUseCase,
+  ArchiveAnalysisUseCase,
 } from './application';
 import { AnalysisRepository } from './infrastructure/repositories/analysis.repository';
 import { AnalysisController } from './presentation/controllers';
@@ -32,6 +34,8 @@ import { CategoryModule } from '../category/category.module';
     PublishAnalysisUseCase,
     SubmitForReviewUseCase,
     DeleteAnalysisUseCase,
+    ArchiveAnalysisUseCase,
+    RejectAnalysisUseCase,
     GetFeaturedAnalysisUseCase,
     ToggleFeaturedAnalysisUseCase,
     GetLatestAnalysisByStockUseCase,
@@ -44,6 +48,8 @@ import { CategoryModule } from '../category/category.module';
     PublishAnalysisUseCase,
     SubmitForReviewUseCase,
     DeleteAnalysisUseCase,
+    ArchiveAnalysisUseCase,
+    RejectAnalysisUseCase,
     GetFeaturedAnalysisUseCase,
     ToggleFeaturedAnalysisUseCase,
     GetLatestAnalysisByStockUseCase,

@@ -46,12 +46,18 @@ export class GetNewsBySlugUseCase {
         // 4. get tags
         const tags = await this.newsRepository.getTagsForNews(news.id); 
         const tagEntities = await this.tagRepository.findByIds(tags.map((t: any) => t.id));
+
+        // 5. Get Author
+        const author = news.authorId
+            ? await this.newsRepository.getAuthorForNews(news.authorId)
+            : null;
         
-        // 3. Return DTO
+        // 6. Return DTO
         return NewsMapper.toDto(
             news,
             category ? CategoryMapper.toDto(category) : null,
             TagMapper.toListDto(tagEntities),
+            author,
         );
     }
 }

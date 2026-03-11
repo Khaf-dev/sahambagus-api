@@ -21,6 +21,7 @@ export interface INewsRepository {
     addTagsToNews(newsId: string, tagIds: string[]): Promise<void>;
     getTagsForNews(newsId: string): Promise<any[]>;
     getCategoryForNews(categoryId: string | null): Promise<any | null>;
+    getAuthorForNews(authorId: string | null): Promise<any | null>;
 }
 
 /**

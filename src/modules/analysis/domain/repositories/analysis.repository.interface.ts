@@ -45,6 +45,7 @@ export interface IAnalysisRepository {
   addTagsToAnalysis(analysisId: string, tagIds: string[]): Promise<void>;
   getTagsForAnalysis(analysisId: string): Promise<any[]>;
   getCategoryForAnalysis(categoryId: string | null): Promise<any | null>;
+  getAuthorForAnalysis(authorId: string | null): Promise<any | null>;
 }
 
 export const IAnalysisRepository = Symbol('IAnalysisRepository');

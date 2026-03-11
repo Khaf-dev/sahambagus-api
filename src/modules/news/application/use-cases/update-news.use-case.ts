@@ -32,7 +32,7 @@ export class UpdateNewsUseCase {
         dto: UpdateNewsDto
     ): Promise<NewsResponseDto> {
         // 1. Find News
-        const news = await this.newsRepository.findBySlug(newsId);
+        const news = await this.newsRepository.findById(newsId);
         if (!news) {
             throw new NewsNotFoundException(newsId);
         }

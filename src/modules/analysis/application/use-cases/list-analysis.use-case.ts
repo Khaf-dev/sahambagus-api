@@ -63,7 +63,18 @@ export class ListAnalysisUseCase {
       categories.filter(Boolean).map((c) => [c!.id, CategoryMapper.toDto(c!)])
     );
 
-    // 5. Get tags for all analysis items
+    // 5. Get all unique IDs
+    const authorIds = [...new Set(analysisList.map((a) => a.authorId).filter(Boolean))] as string[];
+
+    // 6. Get all authors in one query
+    const authors = await Promise.all(
+      authorIds.map((id) => this.analysisRepository.getAuthorForAnalysis(id))
+    );
+    const authorMap = new Map(
+      authors.filter(Boolean).map((a) => [a!.id, a!])
+    );
+
+    // 7. Get tags for all analysis items
     const analysisWithData = await Promise.all(
       analysisList.map(async (analysis) => {
         const tags = await this.analysisRepository.getTagsForAnalysis(analysis.id);
@@ -73,17 +84,18 @@ export class ListAnalysisUseCase {
           analysis,
           analysis.categoryId ? categoryMap.get(analysis.categoryId) : null,
           TagMapper.toListDto(tagEntities),
+          analysis.authorId ? authorMap.get(analysis.authorId) : null,
         );
       })
     );
 
-    // 6. Calculate pagination
+    // 8. Calculate pagination
     const page = options.page || 1;
     const limit = options.limit || 10;
     const totalPages = Math.ceil(total / limit);
 
     return {
-      data: analysisWithData,
+      items: analysisWithData,
       pagination: {
         page,
         limit,

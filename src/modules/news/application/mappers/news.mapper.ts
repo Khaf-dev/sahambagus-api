@@ -15,6 +15,7 @@ export class NewsMapper {
         news: NewsEntity,
         category?: any,
         tags?: any[],
+        author?: any,
 
     ): NewsResponseDto {
         return {
@@ -40,6 +41,7 @@ export class NewsMapper {
             metaKeywords: news.metaKeywords,
     
             authorId: news.authorId,
+            author: author || null,
             editorId: news.editorId,
     
             viewCount: news.viewCount,
@@ -58,6 +60,8 @@ export class NewsMapper {
         news: NewsEntity,
         category?: any,
         tags?: any[],
+        author?: any,
+
     ): NewsListItemDto {
         return {
             id: news.id,
@@ -75,6 +79,7 @@ export class NewsMapper {
             featuredImageUrl: news.featuredImageUrl,
 
             authorId: news.authorId,
+            author: author || null,
             viewCount: news.viewCount,
 
             createdAt: news.createdAt.toISOString(),

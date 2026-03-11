@@ -23,6 +23,12 @@ export class NewsListItemDto {
     featuredImageUrl: string | null;
 
     authorId: string | null;
+    author: {
+        id: string;
+        firstName: string;
+        lastName: string;
+        email: string;
+    } | null;
     viewCount: number;
 
     createdAt: string;

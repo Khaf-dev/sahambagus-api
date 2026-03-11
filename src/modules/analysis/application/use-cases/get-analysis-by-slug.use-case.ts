@@ -43,11 +43,17 @@ export class GetAnalysisBySlugUseCase {
     const tags = await this.analysisRepository.getTagsForAnalysis(analysis.id);
     const tagEntities = await this.tagRepository.findByIds(tags.map((t: any) => t.id));
 
-    // 5. Return DTO
+    // 5. Get author
+    const author = analysis.authorId
+      ? await this.analysisRepository.getAuthorForAnalysis(analysis.authorId)
+      : null;
+
+    // 6. Return DTO
     return AnalysisMapper.toDto(
       analysis,
       category ? CategoryMapper.toDto(category) : null,
       TagMapper.toListDto(tagEntities),
+      author,
     );
   }
 }

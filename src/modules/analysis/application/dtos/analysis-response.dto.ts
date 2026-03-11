@@ -28,6 +28,12 @@ export class AnalysisResponseDto {
   metaKeywords: string | null;
   
   authorId: string | null;
+  author: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  } | null;
   editorId: string | null;
   
   viewCount: number;
